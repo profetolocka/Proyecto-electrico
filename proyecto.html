@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto Eléctrico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, button, select, checkbox {
+      margin-bottom: 10px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #camposAmbientes {
+      margin-top: 20px;
+    }
+
+    hr {
+      margin: 15px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+
+    #resultadoSLA, #resultadoGE, #resultadoCircuitos {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #007BFF;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Proyecto Eléctrico</h1>
+
+  <label for="cantidadAmbientes">Cantidad de Ambientes:</label>
+  <input type="number" id="cantidadAmbientes" min="1" required>
+  <button onclick="crearCampos()">Cargar Ambientes</button>
+
+  <div id="camposAmbientes"></div>
+
+  <button id="calcularSLABtn" style="display: none;" onclick="calcularSLA()">Calcular SLA</button>
+  <p id="resultadoSLA"></p>
+  <p id="resultadoGE"></p>
+  <p id="resultadoCircuitos"></p>
+
+  <div id="tablaCircuitos" style="display: none;">
+    <h2>Tabla de Circuitos</h2>
+    <table id="tablaResultados">
+      <thead>
+        <tr>
+          <th>Nombre Ambiente</th>
+          <th>Tipo de Ambiente</th>
+          <th>Superficie (m²)</th>
+          <th>Circuito IUG</th>
+          <th>Circuito TUG</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <button onclick="reiniciar()">Reiniciar</button>
+
+  <script>
+    const tiposAmbiente = ["Sala de estar", "Comedor", "Comedor diario", "Escritorio", "Estudio", "Dormitorio", "Cocina", "Baño", "Toilette", "Vestíbulo", "Garage", "Hall", "Vestidor", "Pasillo cubierto", "Lavadero", "Espacio Semicubierto"];
+
+    function crearCampos() {
+      const cantidadAmbientes = document.getElementById('cantidadAmbientes').value;
+      
+      if (cantidadAmbientes <= 0) {
+        alert('La cantidad de ambientes debe ser mayor a cero.');
+        return;
+      }
+
+      const camposAmbientesDiv = document.getElementById('camposAmbientes');
+      camposAmbientesDiv.innerHTML = '';
+
+      for (let i = 1; i <= cantidadAmbientes; i++) {
+        const campoAmbiente = document.createElement('div');
+        campoAmbiente.innerHTML = `
+          <h2>Ambiente ${i}</h2>
+          <label for="nombre${i}">Nombre:</label>
+          <input type="text" id="nombre${i}" required>
+
+          <label for="tipo${i}">Tipo:</label>
+          <select id="tipo${i}" required>
+            ${tiposAmbiente.map(tipo => `<option value="${tipo}">${tipo}</option>`).join('')}
+          </select>
+
+          <label for="ancho${i}">Ancho (metros):</label>
+          <input type="number" id="ancho${i}" min="1" required>
+
+          <label for="largo${i}">Largo (metros):</label>
+          <input type="number" id="largo${i}" min="1" required>
+
+          <label for="semicubierto${i}">Semicubierto:</label>
+          <input type="checkbox" id="semicubierto${i}">
+
+          <hr>
+        `;
+        camposAmbientesDiv.appendChild(campoAmbiente);
+      }
+
+      // Mostrar el botón "Calcular SLA" después de crear los campos
+      document.getElementById('calcularSLABtn').style.display = 'block';
+    }
+
+    function calcularSLA() {
+      const cantidadAmbientes = document.getElementById('cantidadAmbientes').value;
+      let totalSLA = 0;
+      let datosIncompletos = false;
+
+      for (let i = 1; i <= cantidadAmbientes; i++) {
+        const nombre = document.getElementById(`nombre${i}`).value.trim();
+        const tipo = document.getElementById(`tipo${i}`).value;
+        const ancho = parseFloat(document.getElementById(`ancho${i}`).value);
+        const largo = parseFloat(document.getElementById(`largo${i}`).value);
+        const esSemicubierto = document.getElementById(`semicubierto${i}`).checked;
+
+        if (!nombre || isNaN(ancho) || isNaN(largo)) {
+          datosIncompletos = true;
+          alert('Por favor, complete todos los datos en los ambientes.');
+          break;
+        }
+
+        if (esSemicubierto) {
+          totalSLA += (ancho * largo) / 2;
+        } else {
+          totalSLA += ancho * largo;
+        }
+      }
+
+      if (!datosIncompletos) {
+        const resultadoSLA = document.getElementById('resultadoSLA');
+        resultadoSLA.textContent = `La SLA total es: ${totalSLA.toFixed(2)} metros cuadrados.`;
+
+        // Calcular y mostrar el Grado de Electrificación (GE)
+        const resultadoGE = document.getElementById('resultadoGE');
+        let geTexto = '';
+        if (totalSLA <= 60) {
+          geTexto = 'El Grado de Electrificación (GE) es Mínimo.';
+        } else if (totalSLA > 60 && totalSLA <= 130) {
+          geTexto = 'El Grado de Electrificación (GE) es Medio.';
+        } else if (totalSLA > 130 && totalSLA <= 200) {
+          geTexto = 'El Grado de Electrificación (GE) es Elevado.';
+        } else {
+          geTexto = 'El Grado de Electrificación (GE) es Superior.';
+        }
+        resultadoGE.textContent = geTexto;
+
+        // Calcular y mostrar la Cantidad Mínima de Circuitos
+        const resultadoCircuitos = document.getElementById('resultadoCircuitos');
+        let cantidadCircuitosTexto = '';
+        if (geTexto.includes('Mínimo')) {
+          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es dos: Un IUG y un TUG.';
+        } else if (geTexto.includes('Medio')) {
+          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es tres: Dos IUG y un TUG o Un IUG y dos TUG.';
+        } else if (geTexto.includes('Elevado')) {
+          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es cinco: Tres IUG y dos TUG o Dos IUG y tres TUG.';
+        } else {
+          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es seis: Dos IUG, tres TUG y un Circuito de Libre elección o Tres IUG, dos TUG y un Circuito de libre elección.';
+        }
+        resultadoCircuitos.textContent = cantidadCircuitosTexto;
+
+        // Mostrar la tabla de Circuitos
+        mostrarTablaCircuitos(cantidadAmbientes);
+      }
+    }
+
+    function mostrarTablaCircuitos(cantidadAmbientes) {
+      const tablaResultados = document.getElementById('tablaResultados');
+      const tbody = tablaResultados.querySelector('tbody');
+      tbody.innerHTML = '';
+
+      for (let i = 1; i <= cantidadAmbientes; i++) {
+        const nombre = document.getElementById(`nombre${i}`).value.trim();
+        const tipo = document.getElementById(`tipo${i}`).value;
+        const ancho = parseFloat(document.getElementById(`ancho${i}`).value);
+        const largo = parseFloat(document.getElementById(`largo${i}`).value);
+        const superficie = ancho * largo;
+
+        const row = document.createElement('tr');
+        const nombreCell = document.createElement('td');
+        nombreCell.textContent = nombre;
+        row.appendChild(nombreCell);
+
+        const tipoCell = document.createElement('td');
+        tipoCell.textContent = tipo;
+        row.appendChild(tipoCell);
+
+        const superficieCell = document.createElement('td');
+        superficieCell.textContent = superficie.toFixed(2);
+        row.appendChild(superficieCell);
+
+        // Añadir celdas en blanco para Circuitos IUG y TUG
+        const circuitoIUGCell = document.createElement('td');
+        circuitoIUGCell.textContent = '';
+        row.appendChild(circuitoIUGCell);
+
+        const circuitoTUGCell = document.createElement('td');
+        circuitoTUGCell.textContent = '';
+        row.appendChild(circuitoTUGCell);
+
+        tbody.appendChild(row);
+      }
+
+      // Mostrar la tabla
+      document.getElementById('tablaCircuitos').style.display = 'block';
+    }
+
+    function reiniciar() {
+      document.getElementById('cantidadAmbientes').value = '';
+      document.getElementById('camposAmbientes').innerHTML = '';
+      document.getElementById('calcularSLABtn').style.display = 'none';
+      document.getElementById('tablaCircuitos').style.display = 'none';
+      document.getElementById('resultadoSLA').textContent = '';
+      document.getElementById('resultadoGE').textContent = '';
+      document.getElementById('resultadoCircuitos').textContent = '';
+    }
+  </script>
+
+</body>
+</html>
