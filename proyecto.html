@@ -1,264 +1,259 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proyecto Eléctrico</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-
-    input, button, select {
-      margin-bottom: 10px;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-
-    button {
-      background-color: #007BFF;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #camposAmbientes {
-      margin-top: 20px;
-    }
-
-    hr {
-      margin: 15px 0;
-      border: none;
-      border-top: 1px solid #ccc;
-    }
-
-    #resultadoSLA, #resultadoGE, #resultadoCircuitos {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-
-    table, th, td {
-      border: 1px solid #ddd;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: left;
-    }
-
-    th {
-      background-color: #007BFF;
-      color: #fff;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Calculadora de Ambientes</title>
+<style>
+  /* Estilos anteriores... */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .tab {
+    display: none;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-top: 10px;
+  }
+  .tab.active {
+    display: block;
+  }
+  .tab-container {
+    width: 80%;
+    max-width: 500px;
+    margin: 50px auto;
+  }
+  input[type="number"], input[type="text"], select, button {
+    width: 95%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  button {
+    width: auto;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  .tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    background-color: #007bff;
+    border-radius: 4px;
+    color: white;
+  }
+  .tabs li {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .tabs li:hover,
+  .tabs li.active {
+    background-color: #0056b3;
+  }
+  .form-container {
+    margin-top: 15px;
+  }
+  .divider {
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+  }
+  .field-title {
+    display: block;
+    margin-top: 10px;
+  }
+</style>
 </head>
 <body>
 
-  <h1>Proyecto Eléctrico</h1>
+<div class="tab-container">
+  <ul class="tabs">
+    <li class="active" onclick="changeTab('Ambientes')">Ambientes</li>
+    <li onclick="changeTab('Demanda')">Demanda</li>
+    <li onclick="changeTab('Cables')">Cables</li>
+  </ul>
 
-  <label for="cantidadAmbientes">Cantidad de Ambientes:</label>
-  <input type="number" id="cantidadAmbientes" min="1" required>
-  <button onclick="crearCampos()">Cargar Ambientes</button>
-
-  <div id="camposAmbientes"></div>
-
-  <button id="calcularSLABtn" style="display: none;" onclick="calcularSLA()">Calcular SLA</button>
-  <p id="resultadoSLA"></p>
-  <p id="resultadoGE"></p>
-  <p id="resultadoCircuitos"></p>
-
-  <div id="tablaCircuitos" style="display: none;">
-    <h2>Tabla de Circuitos</h2>
-    <table id="tablaResultados">
-      <thead>
-        <tr>
-          <th>Nombre Ambiente</th>
-          <th>Tipo de Ambiente</th>
-          <th>Superficie (m²)</th>
-          <th>Circuito IUG</th>
-          <th>Circuito TUG</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <div id="Ambientes" class="tab active">
+    <label for="cantidadAmbientes">Cantidad de ambientes:</label>
+    <input type="number" id="cantidadAmbientes">
+    <button onclick="cargarAmbientes()">Cargar</button>
+    
+    <div id="formContainer" class="form-container">
+      <!-- Los formularios de ambientes se cargarán aquí -->
+    </div>
   </div>
+  <!-- Los otros tabs... -->
+</div>
 
-  <button onclick="reiniciar()">Reiniciar</button>
+<script>
+var ambientesData = [];
 
-  <script>
-    const tiposAmbiente = ["Sala de estar", "Comedor", "Comedor diario", "Escritorio", "Estudio", "Dormitorio", "Cocina", "Baño", "Toilette", "Vestíbulo", "Garage", "Hall", "Vestidor", "Pasillo cubierto", "Lavadero", "Espacio Semicubierto"];
+function changeTab(tabId) {
+  /* Función changeTab... */
+}
 
-    function crearCampos() {
-      const cantidadAmbientes = document.getElementById('cantidadAmbientes').value;
-      
-      if (cantidadAmbientes <= 0) {
-        alert('La cantidad de ambientes debe ser mayor a cero.');
-        return;
-      }
+function cargarAmbientes() {
+  var cantidad = document.getElementById('cantidadAmbientes').value;
+  var container = document.getElementById('formContainer');
+  container.innerHTML = ''; // Limpiar formularios previos
+  ambientesData = []; // Reiniciar la lista de ambientes
 
-      const camposAmbientesDiv = document.getElementById('camposAmbientes');
-      camposAmbientesDiv.innerHTML = '';
-
-      for (let i = 1; i <= cantidadAmbientes; i++) {
-        const campoAmbiente = document.createElement('div');
-        campoAmbiente.innerHTML = `
-          <h2>Ambiente ${i}</h2>
-          <label for="nombre${i}">Nombre:</label>
-          <input type="text" id="nombre${i}" required>
-
-          <label for="tipo${i}">Tipo:</label>
-          <select id="tipo${i}" required>
-            ${tiposAmbiente.map(tipo => `<option value="${tipo}">${tipo}</option>`).join('')}
-          </select>
-
-          <label for="ancho${i}">Ancho (metros):</label>
-          <input type="number" id="ancho${i}" min="1" required>
-
-          <label for="largo${i}">Largo (metros):</label>
-          <input type="number" id="largo${i}" min="1" required>
-
-          <hr>
-        `;
-        camposAmbientesDiv.appendChild(campoAmbiente);
-      }
-
-      // Mostrar el botón "Calcular SLA" después de crear los campos
-      document.getElementById('calcularSLABtn').style.display = 'block';
+  if(cantidad > 0 && !isNaN(cantidad)) {
+    for(var i = 0; i < cantidad; i++) {
+      container.appendChild(crearFormularioAmbiente(i, i === cantidad - 1));
     }
+  }
+}
 
-    function calcularSLA() {
-      const cantidadAmbientes = document.getElementById('cantidadAmbientes').value;
-      let totalSLA = 0;
-      let datosIncompletos = false;
+function crearFormularioAmbiente(index, esUltimo) {
+  var fragment = document.createDocumentFragment();
 
-      for (let i = 1; i <= cantidadAmbientes; i++) {
-        const nombre = document.getElementById(`nombre${i}`).value.trim();
-        const tipo = document.getElementById(`tipo${i}`).value;
-        const ancho = parseFloat(document.getElementById(`ancho${i}`).value);
-        const largo = parseFloat(document.getElementById(`largo${i}`).value);
+  var divider = document.createElement('div');
+  divider.className = 'divider';
+  fragment.appendChild(divider);
 
-        if (!nombre || isNaN(ancho) || isNaN(largo)) {
-          datosIncompletos = true;
-          alert('Por favor, complete todos los datos en los ambientes.');
-          break;
-        }
+  var labelNombre = document.createElement('label');
+  labelNombre.textContent = 'Nombre del ambiente:';
+  labelNombre.className = 'field-title';
+  fragment.appendChild(labelNombre);
 
-        const factorSemicubierto = (tipo === 'Espacio Semicubierto') ? 0.5 : 1;
-        totalSLA += (ancho * largo * factorSemicubierto);
-      }
+  var inputNombre = document.createElement('input');
+  inputNombre.type = 'text';
+  inputNombre.id = 'nombreAmbiente' + index;
+  fragment.appendChild(inputNombre);
 
-      if (!datosIncompletos) {
-        const resultadoSLA = document.getElementById('resultadoSLA');
-        resultadoSLA.textContent = `La SLA total es: ${totalSLA.toFixed(2)} metros cuadrados.`;
+  var labelTipo = document.createElement('label');
+  labelTipo.textContent = 'Tipo de ambiente:';
+  labelTipo.className = 'field-title';
+  fragment.appendChild(labelTipo);
 
-        // Calcular y mostrar el Grado de Electrificación (GE)
-        const resultadoGE = document.getElementById('resultadoGE');
-        let geTexto = '';
-        if (totalSLA <= 60) {
-          geTexto = 'El Grado de Electrificación (GE) es Mínimo.';
-        } else if (totalSLA > 60 && totalSLA <= 130) {
-          geTexto = 'El Grado de Electrificación (GE) es Medio.';
-        } else if (totalSLA > 130 && totalSLA <= 200) {
-          geTexto = 'El Grado de Electrificación (GE) es Elevado.';
-        } else {
-          geTexto = 'El Grado de Electrificación (GE) es Superior.';
-        }
-        resultadoGE.textContent = geTexto;
+  var selectTipo = document.createElement('select');
+  selectTipo.id = 'tipoAmbiente' + index;
+  var tipos = [
+    { text: 'Sala de estar', value: 1 },
+    { text: 'Comedor', value: 1 },
+    { text: 'Comedor diario', value: 1 },
+    { text: 'Escritorio', value: 1 },
+    { text: 'Estudio', value: 1 },
+    { text: 'Biblioteca', value: 1 },
+    { text: 'Dormitorio menos a 10 m2', value: 2 },
+    { text: 'Dormitorio entre 10 y 36 m2', value: 3 },
+    { text: 'Dormitorio más de 36 m2', value: 4 },
+    { text: 'Cocina', value: 5 },
+    { text: 'Baño', value: 6 },
+    { text: 'Toilette', value: 7 },
+    { text: 'Vestíbulo', value: 8 },
+    { text: 'Garaje', value: 8 },
+    { text: 'Hall', value: 8 },
+    { text: 'Vestidor', value: 8 },
+    { text: 'Pasillo cubierto', value: 9 },
+    { text: 'Lavadero', value: 10 },
+    { text: 'Espacio semicubierto', value: 11 }
+  ];
+  tipos.forEach(function(tipo) {
+    var option = document.createElement('option');
+    option.value = tipo.value;
+    option.textContent = tipo.text;
+    selectTipo.appendChild(option);
+  });
+  fragment.appendChild(selectTipo);
 
-        // Calcular y mostrar la Cantidad Mínima de Circuitos
-        const resultadoCircuitos = document.getElementById('resultadoCircuitos');
-        let cantidadCircuitosTexto = '';
-        if (geTexto.includes('Mínimo')) {
-          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es dos: Un IUG y un TUG.';
-        } else if (geTexto.includes('Medio')) {
-          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es tres: Dos IUG y un TUG o Un IUG y dos TUG.';
-        } else if (geTexto.includes('Elevado')) {
-          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es cinco: Tres IUG y dos TUG o Dos IUG y tres TUG.';
-        } else {
-          cantidadCircuitosTexto = 'La Cantidad Mínima de Circuitos es seis: Dos IUG, tres TUG y un Circuito de Libre elección o Tres IUG, dos TUG y un Circuito de libre elección.';
-        }
-        resultadoCircuitos.textContent = cantidadCircuitosTexto;
+  var labelSuperficie = document.createElement('label');
+  labelSuperficie.textContent = 'Superficie (m2):';
+  labelSuperficie.className = 'field-title';
+  fragment.appendChild(labelSuperficie);
 
-        // Mostrar la tabla de Circuitos
-        mostrarTablaCircuitos(cantidadAmbientes);
-      }
+  var inputSuperficie = document.createElement('input');
+  inputSuperficie.type = 'number';
+  inputSuperficie.id = 'superficieAmbiente' + index;
+  fragment.appendChild(inputSuperficie);
+
+  var botonGuardar = document.createElement('button');
+  botonGuardar.textContent = esUltimo ? 'Guardar y Calcular SLA' : 'Guardar';
+  botonGuardar.onclick = function() { guardarDatosAmbiente(index, esUltimo); };
+  fragment.appendChild(botonGuardar);
+
+  return fragment;
+}
+
+function guardarDatosAmbiente(index, esUltimo) {
+  var nombre = document.getElementById('nombreAmbiente' + index).value;
+  var tipo = document.getElementById('tipoAmbiente' + index).value;
+  var superficie = document.getElementById('superficieAmbiente' + index).value;
+
+  var ambiente = {
+    nombre: nombre,
+    tipoAmbiente: parseInt(tipo, 10),
+    superficie: parseFloat(superficie)
+  };
+
+  ambientesData.push(ambiente);
+
+  if (esUltimo) {
+    calcularSLA();
+  }
+}
+
+function calcularSLA() {
+  var sla = ambientesData.reduce(function(suma, ambiente) {
+    if (ambiente.tipoAmbiente === 11) {
+      return suma + (ambiente.superficie * 0.5);
+    } else {
+      return suma + ambiente.superficie;
     }
+  }, 0);
 
-    function mostrarTablaCircuitos(cantidadAmbientes) {
-      const tablaResultados = document.getElementById('tablaResultados');
-      const tbody = tablaResultados.querySelector('tbody');
-      tbody.innerHTML = '';
+  mostrarResultados(sla);
+}
 
-      for (let i = 1; i <= cantidadAmbientes; i++) {
-        const nombre = document.getElementById(`nombre${i}`).value.trim();
-        const tipo = document.getElementById(`tipo${i}`).value;
-        const ancho = parseFloat(document.getElementById(`ancho${i}`).value);
-        const largo = parseFloat(document.getElementById(`largo${i}`).value);
-        const superficie = ancho * largo;
-        const factorSemicubierto = (tipo === 'Espacio Semicubierto') ? 0.5 : 1;
+function mostrarResultados(sla) {
+  var resultadoSLA = document.createElement('p');
+  resultadoSLA.id = 'resultadoSLA';
+  resultadoSLA.textContent = 'SLA Total: ' + sla.toFixed(2) + ' m²';
+  
+  var ge = determinarGE(sla);
+  var resultadoGE = document.createElement('p');
+  resultadoGE.id = 'resultadoGE';
+  resultadoGE.textContent = 'Grado de Electrificación: ' + ge;
 
-        const row = document.createElement('tr');
-        const nombreCell = document.createElement('td');
-        nombreCell.textContent = nombre;
-        row.appendChild(nombreCell);
+  var container = document.getElementById('formContainer');
+  var prevResultSLA = document.getElementById('resultadoSLA');
+  if (prevResultSLA) {
+    container.removeChild(prevResultSLA);
+  }
+  var prevResultGE = document.getElementById('resultadoGE');
+  if (prevResultGE) {
+    container.removeChild(prevResultGE);
+  }
 
-        const tipoCell = document.createElement('td');
-        tipoCell.textContent = tipo;
-        row.appendChild(tipoCell);
+  container.appendChild(resultadoSLA);
+  container.appendChild(resultadoGE);
+}
 
-        const superficieCell = document.createElement('td');
-        superficieCell.textContent = superficie.toFixed(2);
-        row.appendChild(superficieCell);
-
-        // Añadir celdas en blanco para Circuitos IUG y TUG
-        const circuitoIUGCell = document.createElement('td');
-        circuitoIUGCell.textContent = '';
-        row.appendChild(circuitoIUGCell);
-
-        const circuitoTUGCell = document.createElement('td');
-        circuitoTUGCell.textContent = '';
-        row.appendChild(circuitoTUGCell);
-
-        tbody.appendChild(row);
-      }
-
-      // Mostrar la tabla
-      document.getElementById('tablaCircuitos').style.display = 'block';
-    }
-
-    function reiniciar() {
-      document.getElementById('cantidadAmbientes').value = '';
-      document.getElementById('camposAmbientes').innerHTML = '';
-      document.getElementById('calcularSLABtn').style.display = 'none';
-      document.getElementById('tablaCircuitos').style.display = 'none';
-      document.getElementById('resultadoSLA').textContent = '';
-      document.getElementById('resultadoGE').textContent = '';
-      document.getElementById('resultadoCircuitos').textContent = '';
-    }
-  </script>
-
+function determinarGE(sla) {
+  if (sla <= 60) {
+    return 'Mínimo';
+  } else if (sla > 60 && sla <= 130) {
+    return 'Medio';
+  } else if (sla > 130 && sla <= 200) {
+    return 'Elevado';
+  } else {
+    return 'Superior';
+  }
+}
+</script>
 </body>
 </html>
